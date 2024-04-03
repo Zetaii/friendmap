@@ -1,18 +1,20 @@
 import { initializeApp, getApps, getApp } from "firebase/app"
 import { getAuth } from "firebase/auth"
+import { getFirestore } from "firebase/firestore" // Import Firestore
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBroOUpNMRfOUvLq8ifkshPwEM4Yt-P_GM",
-  authDomain: "map-dev-177ae.firebaseapp.com",
-  projectId: "map-dev-177ae",
-  storageBucket: "map-dev-177ae.appspot.com",
-  messagingSenderId: "178424228068",
-  appId: "1:178424228068:web:7e0b59ba337bf23de4e4f1",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 }
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
+const db = getFirestore(app) // Initialize Firestore
+
 const auth = getAuth(app)
 
-export { app, auth }
+export { app, auth, db }
