@@ -26,6 +26,7 @@ const MapPage = () => {
     // Initialize the map once the script is loaded
     window.initMap = () => {
       const mapOptions = {
+        center: { lat: 44.97007, lng: -93.28378 }, // New York City coordinates - will change to default to user's location
         zoom: 10,
       }
       const newMap = new window.google.maps.Map(
