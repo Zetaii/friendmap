@@ -20,7 +20,6 @@ const LandingPage = () => {
           fetchedUsers.push({ id: doc.id, data: doc.data() })
         })
         setUsers(fetchedUsers)
-        console.log("Fetched users:", fetchedUsers)
       } catch (error) {
         console.error("Error fetching users:", error)
       }

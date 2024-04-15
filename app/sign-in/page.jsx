@@ -1,6 +1,6 @@
 "use client"
 import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth"
-import { auth } from "@/app/firebase/config"
+import { auth } from "../firebase/config"
 import { useState } from "react"
 
 const SignIn = () => {

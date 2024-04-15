@@ -20,6 +20,15 @@ const Navbar = () => {
         <a href="/map" className="text-white text-xl font-bold">
           Map
         </a>
+        <a href="/profile " className="text-white text-xl font-bold">
+          Profile
+        </a>
+        <input
+          className="text-black p-1 border-slate-400 border-2 rounded-lg"
+          placeholder="Search for a friend..."
+          type="text"
+        />
+
         {user ? (
           <div className="flex">
             <p className="m-3">Welcome, {user.email}!</p>
