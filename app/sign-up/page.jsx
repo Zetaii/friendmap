@@ -78,7 +78,7 @@ const SignUp = () => {
           type="address"
           placeholder="Address"
           value={address}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => setAddress(e.target.value)}
           className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
         />
         <input

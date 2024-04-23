@@ -2,11 +2,35 @@
 
 import React, { useEffect, useState } from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
-import { auth } from "../firebase/config"
+import { auth, db } from "../firebase/config"
+import { collection, getDoc, doc, getDocs } from "firebase/firestore"
 
 function page() {
   const [user] = useAuthState(auth)
   const [users, setUsers] = useState(null)
+  const [userData, setUserData] = useState(null) // State variable to store user data
+
+  useEffect(() => {
+    const fetchDocument = async () => {
+      try {
+        if (user) {
+          const userDocRef = doc(db, "users", `${user.uid}`) // Specify user's UID
+          const docSnapshot = await getDoc(userDocRef)
+          if (docSnapshot.exists()) {
+            const userData = docSnapshot.data()
+
+            setUserData(userData)
+            console.log("Test data:", userData)
+          } else {
+            console.log("No such document!")
+          }
+        }
+      } catch (error) {
+        console.error("Error getting document:", error)
+      }
+    }
+    fetchDocument()
+  }, [user]) // Ensure useEffect runs when user changes
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -29,8 +53,11 @@ function page() {
 
   return (
     <div>
+      <div>User: {userData ? `${userData.username}` : "No user data"}</div>
+      <div>Home: {userData ? `${userData.address}` : "No user data"}</div>
+
       <div className="m-2">
-        <h1>Profile</h1>
+        <h1>Friends</h1>
       </div>
       <div className="m-2 bg-slate-800 w-64 p-2 ">
         <h2>Name: Steven</h2>

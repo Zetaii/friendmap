@@ -1,8 +1,9 @@
 "use client"
+
 import React, { useState, useEffect } from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { auth, db } from "../firebase/config"
-import { collection, getDocs } from "firebase/firestore"
+import { collection, getDoc, doc, getDocs } from "firebase/firestore"
 import Chat from "../components/Chat"
 
 const MapPage = () => {
@@ -10,10 +11,33 @@ const MapPage = () => {
   const [map, setMap] = useState(null)
   const [travelTime, setTravelTime] = useState(null)
   const [users, setUsers] = useState(null)
+  const [userData, setUserData] = useState(null) // State variable to store user data
 
   const [user] = useAuthState(auth)
 
   const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+
+  useEffect(() => {
+    const fetchDocument = async () => {
+      try {
+        if (user) {
+          const userDocRef = doc(db, "users", "9xyMSsYByEXpWjLq8FAkyG1XfvE3") // Specify user's UID
+          const docSnapshot = await getDoc(userDocRef)
+          if (docSnapshot.exists()) {
+            const userData = docSnapshot.data()
+
+            setUserData(userData)
+            console.log("User data:", userData)
+          } else {
+            console.log("No such document!")
+          }
+        }
+      } catch (error) {
+        console.error("Error getting document:", error)
+      }
+    }
+    fetchDocument()
+  }, [user]) // Ensure useEffect runs when user changes
 
   useEffect(() => {
     // Load the Google Maps API script
@@ -56,51 +80,74 @@ const MapPage = () => {
     fetchUsers()
   }, []) // Empty dependency array ensures this effect runs only once after component mounts
 
+  const calculateRoute = () => {
+    if (!userData || !userData.address || !destination) {
+      console.error("Origin or destination not provided")
+      return
+    }
+
+    const directionsService = new window.google.maps.DirectionsService()
+
+    directionsService.route(
+      {
+        origin: userData.address,
+        destination: destination,
+        travelMode: window.google.maps.TravelMode.DRIVING,
+      },
+      (response, status) => {
+        if (status === "OK") {
+          // Display the route on the map
+          const directionsRenderer = new window.google.maps.DirectionsRenderer()
+          directionsRenderer.setMap(map)
+          directionsRenderer.setDirections(response)
+
+          // Set travel time
+          const route = response.routes[0]
+          setTravelTime(route.legs[0].duration.text)
+        } else {
+          console.error("Directions request failed due to " + status)
+        }
+      }
+    )
+  }
+
   return (
     <div className="border-2">
       <div>
-        <h1>Google Maps</h1>
         <Chat />
-        <div>
-          <label>Destination:</label>
-          <input
-            className="text-black"
-            type="text"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-          />
-        </div>
-        <button className="bg-white text-black mt-2">Calculate Route</button>
-        <div>
-          {users && (
-            <div className="flex">
-              {users.map((user) => (
-                <div key={user.id}>
-                  <button className="bg-slate-500 rounded m-2">
-                    {user.data.Name}
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        {users && (
-          <div className="ml-2">
-            <h2 className="text-lg font-bold">People</h2>
-            {users.map((user) => (
-              <div key={user.id}>
-                <p className="mb-1 font-bold">{user.data.username}</p>
-                <p className="test">Travel Time: {user.travelTime}</p>
-                <p>Location: {user.data.address}</p>
-              </div>
-            ))}
+        <div className="">
+          <div className="m-1">
+            <label>Origin: </label>
+            <input
+              className="text-black text-center"
+              type="text"
+              placeholder={
+                !userData || !userData.address ? "Enter origin..." : ""
+              }
+              value={userData && userData.address ? userData.address : ""}
+              readOnly
+            />
           </div>
-        )}
+          <div className="m-1">
+            <label>Destination: </label>
+            <input
+              className="text-black text-center "
+              type="text"
+              placeholder="Enter destination... "
+              onChange={(e) => setDestination(e.target.value)}
+            />
+          </div>
+        </div>
+        <button className="bg-white text-black mt-2" onClick={calculateRoute}>
+          Calculate Route
+        </button>
+        <div>{travelTime && <p>Travel time: {travelTime}</p>}</div>
+        {/* Other JSX */}
       </div>
       <div
-        className="ml-[25%] mt-5  "
+        className="ml-[25%] mt-20"
         id="map"
-        style={{ height: "500px", width: "50%" }}
+        style={{ height: "400px", width: "30%" }}
       ></div>
     </div>
   )

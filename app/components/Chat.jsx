@@ -87,7 +87,10 @@ const Chat = () => {
               {messages.map((message) => (
                 <div>
                   <div className="flex justify-between">
-                    <h1 className="font-bold text-l text-blue-300">
+                    <h1
+                      className="font-bold text-l text-blue-300 "
+                      key={message.uid}
+                    >
                       {message.username}
                     </h1>
                     <h1>{formatTime(message.createdAt)}</h1>

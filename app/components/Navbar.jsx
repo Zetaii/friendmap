@@ -31,7 +31,7 @@ const Navbar = () => {
 
         {user ? (
           <div className="flex">
-            <p className="m-3">Welcome, {user.email}!</p>
+            <p className="m-3">{user.email}</p>
             <button onClick={handleSignOut}>Sign Out</button>
           </div>
         ) : (
