@@ -80,7 +80,7 @@ const Chat = () => {
 
   return (
     <>
-      <div className="absolute right-80">
+      <div className="">
         <div className="bg-slate-600 rounded-lg p-2 ">
           <form onSubmit={handleSubmit}>
             <div>
@@ -99,15 +99,17 @@ const Chat = () => {
                 </div>
               ))}
             </div>
-            <input
-              placeholder="Type your message here..."
-              className="text-black"
-              onChange={(e) => setNewMessage(e.target.value)}
-              value={newMessage}
-            />
-            <button type="submit" className="ml-2 bg-blue-400">
-              Send
-            </button>
+            <div className="flex">
+              <input
+                placeholder="Type your message here..."
+                className="text-black"
+                onChange={(e) => setNewMessage(e.target.value)}
+                value={newMessage}
+              />
+              <button type="submit" className="ml-2 bg-blue-400">
+                Send
+              </button>
+            </div>
           </form>
         </div>
       </div>
