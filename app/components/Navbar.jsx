@@ -1,8 +1,8 @@
 "use client"
-
 import React from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { auth } from "../firebase/config"
+import FriendSearch from "./FriendSearch"
 
 const Navbar = () => {
   const [user] = useAuthState(auth)
@@ -23,12 +23,8 @@ const Navbar = () => {
         <a href="/profile " className="text-white text-xl font-bold">
           Profile
         </a>
-        <input
-          className="text-black p-1 border-slate-400 border-2 rounded-lg"
-          placeholder="Search for a friend..."
-          type="text"
-        />
-
+        {/* Pass currentUserUid as a prop */}
+        {user && <FriendSearch currentUserUid={user.uid} />}{" "}
         {user ? (
           <div className="flex">
             <p className="m-3">{user.email}</p>

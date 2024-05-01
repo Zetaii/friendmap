@@ -1,33 +1,58 @@
 "use client"
-
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { auth, db } from "../firebase/config"
 import { collection, getDoc, doc, getDocs } from "firebase/firestore"
 import Chat from "../components/Chat"
+import FriendBox from "../components/FriendBox"
+import GoogleAutoComplete from "../components/GoogleAutoComplete"
 
 const MapPage = () => {
   const [destination, setDestination] = useState("")
   const [map, setMap] = useState(null)
   const [travelTime, setTravelTime] = useState(null)
   const [users, setUsers] = useState(null)
-  const [userData, setUserData] = useState(null) // State variable to store user data
+  const [userData, setUserData] = useState(null)
+  const [friendTravelTimes, setFriendTravelTimes] = useState({})
+  const [selectedFriends, setSelectedFriends] = useState([])
+  const [selectedFriendIds, setSelectedFriendIds] = useState([])
 
   const [user] = useAuthState(auth)
+  const destinationInputRef = useRef(null)
 
   const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+
+  useEffect(() => {
+    // Load the Google Maps API script
+    const script = document.createElement("script")
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places&callback=initMap`
+    script.async = true
+    script.defer = true
+    document.head.appendChild(script)
+
+    // Initialize the map once the script is loaded
+    window.initMap = () => {
+      const mapOptions = {
+        center: { lat: 44.97007, lng: -93.28378 },
+        zoom: 10,
+      }
+      const newMap = new window.google.maps.Map(
+        document.getElementById("map"),
+        mapOptions
+      )
+      setMap(newMap)
+    }
+  }, [])
 
   useEffect(() => {
     const fetchDocument = async () => {
       try {
         if (user) {
-          const userDocRef = doc(db, "users", "9xyMSsYByEXpWjLq8FAkyG1XfvE3") // Specify user's UID
+          const userDocRef = doc(db, "users", user.uid)
           const docSnapshot = await getDoc(userDocRef)
           if (docSnapshot.exists()) {
             const userData = docSnapshot.data()
-
             setUserData(userData)
-            console.log("User data:", userData)
           } else {
             console.log("No such document!")
           }
@@ -37,29 +62,7 @@ const MapPage = () => {
       }
     }
     fetchDocument()
-  }, [user]) // Ensure useEffect runs when user changes
-
-  useEffect(() => {
-    // Load the Google Maps API script
-    const script = document.createElement("script")
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap`
-    script.async = true
-    script.defer = true
-    document.head.appendChild(script)
-
-    // Initialize the map once the script is loaded
-    window.initMap = () => {
-      const mapOptions = {
-        center: { lat: 44.97007, lng: -93.28378 }, // New York City coordinates - will change to default to user's location
-        zoom: 10,
-      }
-      const newMap = new window.google.maps.Map(
-        document.getElementById("map"),
-        mapOptions
-      )
-      setMap(newMap)
-    }
-  }, []) // Empty dependency array to ensure it runs only once on mount
+  }, [user])
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -78,46 +81,31 @@ const MapPage = () => {
     }
 
     fetchUsers()
-  }, []) // Empty dependency array ensures this effect runs only once after component mounts
+  }, [])
 
-  const calculateRoute = () => {
-    if (!userData || !userData.address || !destination) {
+  const calculateRoute = (customDestination) => {
+    const destinationToUse = customDestination || destination // Use custom destination if provided, otherwise use state destination
+
+    if (!userData || !userData.address || !destinationToUse) {
       console.error("Origin or destination not provided")
       return
     }
 
     const directionsService = new window.google.maps.DirectionsService()
+  }
 
-    directionsService.route(
-      {
-        origin: userData.address,
-        destination: destination,
-        travelMode: window.google.maps.TravelMode.DRIVING,
-      },
-      (response, status) => {
-        if (status === "OK") {
-          // Display the route on the map
-          const directionsRenderer = new window.google.maps.DirectionsRenderer()
-          directionsRenderer.setMap(map)
-          directionsRenderer.setDirections(response)
-
-          // Set travel time
-          const route = response.routes[0]
-          setTravelTime(route.legs[0].duration.text)
-        } else {
-          console.error("Directions request failed due to " + status)
-        }
-      }
-    )
+  const handleCalculateTravelTime = (destination) => {
+    // Implement the logic to calculate travel time from the destination
+    // For now, let's just log the destination
+    console.log("Calculating travel time to:", destination)
   }
 
   return (
-    <div className="border-2">
-      <div>
-        <Chat />
+    <div className="border-2 h-fit flex">
+      <div className="w-[50%]">
         <div className="">
-          <div className="m-1">
-            <label>Origin: </label>
+          <div className="m-1 w-full text-center">
+            <label className="pr-6 text-center  ">Origin: </label>
             <input
               className="text-black text-center"
               type="text"
@@ -128,27 +116,32 @@ const MapPage = () => {
               readOnly
             />
           </div>
-          <div className="m-1">
-            <label>Destination: </label>
-            <input
-              className="text-black text-center "
-              type="text"
-              placeholder="Enter destination... "
-              onChange={(e) => setDestination(e.target.value)}
-            />
+          <GoogleAutoComplete
+            destinationInputRef={destinationInputRef}
+            setDestination={(destination) => calculateRoute(destination)} // Pass the selected destination
+          />
+          <div className="flex w-full pr-6   m-1 text-center">
+            <label className="ml-2">Travel Time:</label>
+            {travelTime && (
+              <p className="ml-4 text-center bg-white text-black w-56">
+                {travelTime}
+              </p>
+            )}
           </div>
         </div>
-        <button className="bg-white text-black mt-2" onClick={calculateRoute}>
-          Calculate Route
-        </button>
-        <div>{travelTime && <p>Travel time: {travelTime}</p>}</div>
-        {/* Other JSX */}
+        <div>My Friends: </div>
       </div>
-      <div
-        className="ml-[25%] mt-20"
-        id="map"
-        style={{ height: "400px", width: "30%" }}
-      ></div>
+      <div className=" w-full">
+        <FriendBox onCalculateTravelTime={handleCalculateTravelTime} />
+        <div
+          className=" mt-60 ml-24"
+          id="map"
+          style={{ height: "400px", width: "80%" }}
+        ></div>
+      </div>
+      <div className="w-[25%] ml-12 mr-16">
+        <Chat />
+      </div>
     </div>
   )
 }
