@@ -50,7 +50,7 @@ const Chat = () => {
     onSnapshot(queryMessages, (snapshot) => {
       let messages = []
       snapshot.forEach((doc) => {
-        messages.push({ ...doc.data(), id: doc.uid })
+        messages.push({ ...doc.data(), id: doc.id })
       })
       setMessages(messages)
     })
@@ -80,16 +80,17 @@ const Chat = () => {
 
   return (
     <>
-      <div className="">
-        <div className="bg-slate-600 rounded-lg p-2 ">
+      <div className="w-full h-[93vh] border-black border-l-4">
+        <div className="bg-slate-900 h-full p-2">
+          <div className="border-b-2 mb-[10%] w-full bg-black">Chat Box</div>
           <form onSubmit={handleSubmit}>
             <div>
-              {messages.map((message) => (
-                <div>
+              {messages.map((message, index) => (
+                <div className="border-b-2" key={index}>
                   <div className="flex justify-between">
                     <h1
                       className="font-bold text-l text-blue-300 "
-                      key={message.uid}
+                      key={message.id}
                     >
                       {message.username}
                     </h1>
@@ -99,12 +100,13 @@ const Chat = () => {
                 </div>
               ))}
             </div>
-            <div className="flex">
+            <div className="flex mt-10">
               <input
                 placeholder="Type your message here..."
                 className="text-black"
                 onChange={(e) => setNewMessage(e.target.value)}
                 value={newMessage}
+                id="messageInput"
               />
               <button type="submit" className="ml-2 bg-blue-400">
                 Send
