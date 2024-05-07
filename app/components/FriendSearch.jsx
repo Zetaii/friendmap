@@ -106,16 +106,24 @@ const FriendSearch = ({ currentUserUid }) => {
 
   return (
     <div>
-      <input
-        ref={inputRef}
-        className="text-black p-1 border-slate-400 border-2 rounded-lg w-56"
-        placeholder="Search for a friend..."
-        type="text"
-        value={searchQuery}
-        onChange={handleSearchChange}
-        onFocus={handleInputFocus}
-        onBlur={handleInputBlur}
-      />
+      <div className="relative">
+        <input
+          ref={inputRef}
+          className="text-black p-1 border-slate-400 border-2 rounded-lg w-56"
+          placeholder="Search for a friend..."
+          type="text"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
+          id="searchInput"
+        />
+        <img
+          src="searchblue.png"
+          alt="search icon"
+          className="absolute z-100 bg-white right-1 top-1/2 transform -translate-y-1/2 w-6 h-6"
+        />
+      </div>
 
       {showUserList && (
         <div
