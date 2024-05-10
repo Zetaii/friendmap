@@ -58,6 +58,7 @@ function Page() {
         return friend ? { id: friend.id, data: friend.data } : null
       })
       setUserFriends(friendsData.filter(Boolean))
+      console.log("Friends data:", friendsData)
     }
   }, [userData, users])
 

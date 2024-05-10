@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require("tailwindcss/plugin")
+
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -14,5 +16,18 @@ module.exports = {
       },
     },
   },
-  plugins: [],
-};
+  plugins: [
+    function ({ addUtilities }) {
+      const newUtilities = {
+        ".scrollbar-hide::-webkit-scrollbar": {
+          display: "none",
+        },
+        ".no-scrollbar": {
+          "-mis-overflow-style": "none",
+          "scrollbar-width": "none",
+        },
+      }
+      addUtilities(newUtilities)
+    },
+  ],
+}

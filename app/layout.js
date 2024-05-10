@@ -1,8 +1,12 @@
 import Navbar from "./components/Navbar"
 import "./globals.css"
+import Sidebar from "./components/Sidebar"
+import Footer from "./components/Footer"
 import { Inter } from "next/font/google"
+import { Poppins } from "next/font/google"
 
 const inter = Inter({ subsets: ["latin"] })
+const poppins = Poppins({ subsets: ["latin"], weight: ["400", "700", "800"] })
 
 export const metadata = {
   title: "Friendmap",
@@ -13,9 +17,17 @@ export default function RootLayout({ children }) {
   return (
     <>
       <html lang="en">
-        <body className={inter.className}>
+        <body
+          className={`${poppins.className} bg-slate-700 scrollbar-hide overflow-y-auto flex flex-col min-h-screen`}
+        >
           <Navbar />
-          {children}
+          <div className="flex flex-1 ">
+            <Sidebar />
+            <div className="flex-1 bg-slate-900">{children}</div>
+          </div>
+          <div className="border-top-2 border-white">
+            <Footer />
+          </div>
         </body>
       </html>
     </>

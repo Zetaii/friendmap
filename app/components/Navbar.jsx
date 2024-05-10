@@ -12,15 +12,15 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="bg-blue-500 p-4">
+    <nav className="bg-slate-900  text-blue-400 border-b-black border-b-4">
       <div className="container mx-auto flex justify-between items-center">
-        <a href="/" className="text-white text-xl font-bold">
+        <a href="/" className=" text-xl font-extrabold">
           Home
         </a>
-        <a href="/map" className="text-white text-xl font-bold">
+        <a href="/map" className=" text-xl font-extrabold">
           Map
         </a>
-        <a href="/profile " className="text-white text-xl font-bold">
+        <a href="/profile " className=" text-xl font-extrabold">
           Profile
         </a>
         {/* Pass currentUserUid as a prop */}
